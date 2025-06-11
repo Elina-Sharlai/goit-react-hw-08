@@ -1,28 +1,50 @@
 import css from './Contact.module.css';
-import { RiContactsFill } from 'react-icons/ri';
-import { FaPhoneAlt } from 'react-icons/fa';
+import { IoMdContact } from 'react-icons/io';
+import { MdLocalPhone, MdOutlineModeEdit } from 'react-icons/md';
+import { MdDelete } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
-import { deleteContact } from '../../redux/contactsOps';
+import { deleteContact } from '../../redux/contacts/operations';
+import { setCurrentContact } from '../../redux/contacts/slice';
+import toast from 'react-hot-toast';
 
-export default function Contact({ contact }) {
+export default function Contact({ data: { id, name, number } }) {
+  const link = `tel:${number}`;
   const dispatch = useDispatch();
+
   const handleDelete = () => {
-    dispatch(deleteContact(contact.id));
+    dispatch(deleteContact(id))
+      .unwrap()
+      .then(() => toast.success('Contact deleted'))
+      .catch(() => toast.error('Contact not deleted'));
+  };
+
+  const handleEdit = () => {
+    console.log('Set current Contact');
+    dispatch(setCurrentContact({ id, name, number }));
   };
 
   return (
-    <div className={css.container}>
-      <div>
-        <p>
-          <RiContactsFill className={css.icon} />
-          {contact.name}
-        </p>
-        <p>
-          <FaPhoneAlt className={css.icon} />
-          {contact.number}
-        </p>
+    <>
+      <div className={css.data}>
+        <div className={css.dataWrapper}>
+          <IoMdContact size={25} />
+          <h3>{name}</h3>
+        </div>
+        <div className={css.dataWrapper}>
+          <MdLocalPhone size={23} />
+          <a className={css.numberLink} href={link}>
+            {number}
+          </a>
+        </div>
       </div>
-      <button onClick={handleDelete}>Delete</button>
-    </div>
+      <div>
+        <button className={css.button} type="button" onClick={handleEdit}>
+          <MdOutlineModeEdit size={25} />
+        </button>
+        <button className={css.button} type="button" onClick={handleDelete}>
+          <MdDelete size={25} />
+        </button>
+      </div>
+    </>
   );
 }

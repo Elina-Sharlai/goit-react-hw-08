@@ -1,15 +1,19 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useId } from 'react';
 import * as Yup from 'yup';
-import css from './ContactForm.module.css';
-import { useDispatch } from 'react-redux';
-import { addContact } from '../../redux/contacts/operations';
+import css from '../ContactForm/ContactForm.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, editContact } from '../../redux/contacts/operations';
 import toast from 'react-hot-toast';
+import { selectCurrentContact } from '../../redux/contacts/selectors';
+import { setCurrentContact } from '../../redux/contacts/slice';
 
-export default function ContactForm() {
+export default function EditContactForm() {
+  const prevData = useSelector(selectCurrentContact);
+
   const initialValues = {
-    name: '',
-    number: '',
+    name: prevData.name,
+    number: prevData.number,
   };
 
   const nameFieldId = useId();
@@ -28,12 +32,18 @@ export default function ContactForm() {
 
   const dispatch = useDispatch();
 
-  const handleSubmit = (values, actions) => {
-    dispatch(addContact(values))
+  const handleSubmit = values => {
+    dispatch(editContact({ id: prevData.id, ...values }))
       .unwrap()
-      .then(() => toast.success('Added new contact'))
-      .catch(() => toast.error('Contact not'));
-    actions.resetForm();
+      .then(() => {
+        toast.success('Contact updated');
+        dispatch(setCurrentContact(null));
+      })
+      .catch(() => toast.error('Error while trying to update contact'));
+  };
+
+  const handleExit = () => {
+    dispatch(setCurrentContact(null));
   };
 
   return (
@@ -57,7 +67,10 @@ export default function ContactForm() {
         <ErrorMessage className={css.error} name="number" component="span" />
 
         <button type="submit" className={css.button}>
-          Add contact
+          Save
+        </button>
+        <button type="button" className={css.button} onClick={handleExit}>
+          Exit
         </button>
       </Form>
     </Formik>
