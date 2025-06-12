@@ -3,26 +3,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import ContactForm from '../components/ContactForm/ContactForm.jsx';
 import SearchBox from '../components/SearchBox/SearchBox.jsx';
 import ContactList from '../components/ContactList/ContactList.jsx';
-import { fecthContacts } from '../redux/contacts/operations.js';
+import { fetchContacts } from '../redux/contacts/operations.js';
 import {
   selectContacts,
   selectLoading,
   selectError,
   selectCurrentContact,
 } from '../redux/contacts/selectors.js';
-import { selectQueryFilter } from '../redux/filters/selectors.js';
+import { selectNameFilter } from '../redux/filters/selectors.js';
 import EditContactForm from '../components/EditContactForm/EditContactForm.jsx';
 
 export default function ContactsPage() {
   const contacts = useSelector(selectContacts);
-  const filter = useSelector(selectQueryFilter);
+  const filter = useSelector(selectNameFilter);
   const isLoading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const isEdit = !!useSelector(selectCurrentContact);
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fecthContacts());
+    dispatch(fetchContacts());
   }, [dispatch]);
 
   return (
